@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html  onselectstart="return false">
+	<head>
+		<meta charset="UTF-8">
+		<title>HOHO播放器</title>
+		<link rel="icon" type="image/png" href="img/singer/hoho-icon.png"/>
+		<style type="text/css">
+			*{padding:0;margin: 0;}
+			a{display: block;text-decoration: none;color: white;}ul{list-style: none;}
+			body{font-size: 16px ;background-color: white;font-family: "微软雅黑"}img{width: 100%;}
+			.line{width: 1px;height: 60px;background-color: white}
+			
+			.icon{background-repeat: no-repeat;height:30px;width: 30px;background-size: cover;display: inline-block;vertical-align: middle;}
+			.icon-play{background-image: url(img/player/play.png);}
+			.icon-pause{background-image: url(img/player/bofang.png);}
+			.icon-prev{background-image: url(img/player/shangyiqu.png);}
+			.icon-next{background-image: url(img/player/xiayiqu.png);}
+			.icon-valume{background-image: url(img/player/valume.png);}
+			.icon-list{background-image: url(img/player/liebiao.png);}
+			.icon-circla{background-image: url(img/player/xunhuan.png);}
+			.icon-sinle{background-image: url(img/player/single.png);}
+			.icon-order{background-image: url(img/player/ttpodicon-copy.png);}
+			.icon-novolume{background-image: url(img/player/novolume.png);}
+			.icon-drag{background-image: url(img/player/drag.png)}
+			
+			.player-wrap{
+				background-color: rgba(0,0,0,0.8);
+				padding: 0 10px;box-sizing: border-box;position: fixed;
+				top: 100px;
+				left: 200px;
+			}
+			
+			.player-inner{position: relative;}
+			.player-main{display: flex;}
+			.song-control{display: flex;justify-content: space-between;align-items: center;}
+			
+		    /*控制条*/
+		    .player-control{display: flex;box-sizing: border-box;}
+		    /*线条*/
+			
+			.move{
+				position: absolute;
+				bottom:0;left:50%;
+				-webkit-transform:translate(-50%) ;
+				-moz-transform: translate(-50%);
+				-ms-transform: translate(-50%);
+				-o-transform: translate(-50%);
+				transform:translate(-50%) ;
+				background-color: rgba(255,255,255,0.4);height: 20px;width: 200px;
+				-webkit-border-radius: 40px 40px 0 0;
+				-moz-border-radius:40px 40px 0 0 ;
+				border-radius:40px 40px 0 0 ;
+		   		cursor: pointer;
+			}
+			 /*列表*/
+		   .song-list{
+			   	background-color: #808080;position: absolute; 
+			    left:0px;
+			   	color: white;box-sizing: border-box;overflow: hidden;
+			   	top: -200px;
+			   	display: none;
+			   	/*visibility: hidden;*/
+			   	/*transition: 0.5s;*/
+			   	/*transform-origin: bottom;*/
+		   }
+			 /*小屏*/
+		   @media only screen and (max-width: 920px) {
+				.player-wrap{width: 180px;}
+				.line{display: none;}
+				.player-main{ flex-direction: column; justify-content: space-between; align-items: center; padding: 10px 0 20px 0;}
+				.song-schedule{display: none;}
+				.player-control{height: 150px;width: 100%;margin: 20px 0;  flex-direction: column;justify-content: space-between;align-items: center;
+				  -webkit-border-radius:100% ;
+				  -moz-border-radius:100% ;
+				  border-radius:100% ;background-color:rgba(255,255,255,0.5);padding: 5px;}
+				.song-info{width: 100%;height: 80px;}
+				.song-control{width: 100%;padding: 0 10px;box-sizing: border-box;}
+				.play-type{display: none;}
+				div#valume{display: none;}
+				.move{width: 100px;}
+				.mini{display: block;}
+				.song-list{height: 300px;width: 200%;top: 0;}
+				
+			}
+			/*大屏*/
+			@media only screen and (min-width:920px ) {
+				.player-wrap{height: 120px;width: 900px;}
+				.song-control{width: 300px;padding: 0 20px;box-sizing: border-box;}
+				.player-main{justify-content: space-between;align-items: center;}
+				.player-control{width: 76%;height: 80px;align-items: center;justify-content: space-between;padding: 0 20px;}
+				.song-info{width: 23%;height: 80px;}
+				.song-list{height: 200px;width: 100%;left: 0;}
+				.mini{display: none;}
+			}
+			/*歌曲信息*/
+		    .song-info{display: flex;justify-content: flex-start;align-items:  center;}
+		    .songImg{width: 70px;height: 70px;overflow: hidden;}
+		    .song-text{color: white;}
+		    .song-text>p{margin: 5px; }
+		    #singer{color: rgba(255,255,255,0.5);font-size: 14px;}
+		    
+		    
+		    /*暂停*/
+		    #pause{height: 50px;width: 50px;}
+		    
+		    /*类型*/
+		    .play-type{position: relative;}
+		    .play-type.on ul{display: none;}
+		    .play-type ul{background-color: black;z-index: 2;position: absolute;padding: 10px;min-width: 100px;
+		    -webkit-transform: translateX(-35%);
+		    -moz-transform: translateX(-35%);
+		    -ms-transform: translateX(-35%);
+		    -o-transform: translateX(-35%);
+		    transform: translateX(-35%);margin-top: 15px;-webkit-border-radius: 5px;
+		    -moz-border-radius: 5px;
+		    border-radius: 5px;}
+		    .play-type ul:after{
+		    	content: "";
+		    	position: absolute;
+		    	border:15px solid transparent ;
+		    	border-bottom-color: black;
+		    	top: -30px;
+		    	left: 50%;
+				-webkit-transform:translateX(-50%) ;
+				-moz-transform: translateX(-50%);
+				-ms-transform: translateX(-50%);
+				-o-transform: translateX(-50%);
+				transform:translateX(-50%) ;;
+		    }
+		    .play-type ul li{padding: 8px 0;}
+		    
+		    
+		    /*音量*/
+		    #valume{display: flex;align-items: center;justify-content: flex-start;}
+		    .valume-progress{background-color: rgba(255,255,255,0.8);width: 80px;height: 5px;position: relative;margin-left: 8px;
+		    cursor: pointer;}
+		    .valume-progress  .value-ball{height: 20px;width: 20px;top: -7.5px;left: 10px;}
+		    .valume-on{position: absolute;left: 0;top: 0;background-color:deepskyblue;height: 5px;width: 10px;}
+		    
+		   
+		   .song-content{
+		   		position: absolute;top: 0;width: 100%;
+		   }
+		   
+		   .song-list.on{
+		     	/*transform: scaleY(0);*/
+		   }
+		   .song-list .title{
+		   		padding: 10px 20px 0 20px;
+		   		font-size: 18px;
+		   }
+		    .song-list ul {
+		   		padding: 10px 20px;
+		   	}
+		    .song-list ul li{
+		    	background-color: rgba(255,255,255,0.2);
+		    	-webkit-transition: 0.1s;
+		    	-moz-transition: 0.1s;
+		    	-ms-transition: 0.1s;
+		    	-o-transition: 0.1s;
+		    	transition: 0.1s;
+		    	margin-bottom: 5px;
+		    }
+		    .song-list ul li:hover{
+		     	background-color: rgba(0,0,0,0.5)
+		     }
+		     .song-list ul li.on{
+		     	background-color: rgba(0,0,0,0.5)
+		     }
+		    .song-list ul li a{
+		    	padding: 5px 10px;
+		    }
+		    /*进度条*/
+		   .song-schedule{
+		   		position: relative;
+		   }
+		    .song-progress{width: 95%;background-color: white;height: 3px; margin: auto;margin-top:8px ; 
+		    position: relative;cursor: pointer;}
+		    .ball{height: 16px ;width: 16px;background-color: white;
+		    -webkit-border-radius: 100%;
+		    -moz-border-radius:100% ;
+		    border-radius:100% ;position: absolute;
+		    left: 50px;top: -6px;}
+		    .song-comple{background-color: deepskyblue;height: 100%;width: 50px;position: absolute;top: 0;left: 0;}
+		    .song-time>span{position: absolute;top:8px;color: white;font-size: 14px;letter-spacing: 1px;}
+		    .allTime{right:0 ;}
+		    
+		    /*滚动条*/
+		   .roller{
+		   		background-color: lightblue;width: 100%;
+		   		-webkit-border-radius: 10px;
+		   		-moz-border-radius: 10px;
+		   		border-radius: 10px;
+		   	}
+		   .orbital{
+		   	   /*background-color: rgba(0,0,0,0.3);*/
+		   	   width: 8px;
+		   	   height: 100%;
+		   }
+		  
+		</style>
+		<script src="js/jquery-1.7.2.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body>
+		
+		<div class="player-wrap">
+			<div class="song-list on">
+				<div class="song-content">
+					<h1 class="title">歌曲列表</h1>
+					<ul></ul>
+				</div>
+			</div>
+			<div class="player-inner">
+				<div class="player-main">
+					<audio id="audio" autoplay ></audio>
+					<!--歌曲信息-->
+					<div class="song-info">
+						<div class="songImg">
+							<img src=""/>
+						</div>
+						<div class="song-text">
+							<p id="songName"></p>
+							<p id="singer"></p>
+						</div>
+					</div>
+					
+					<!--线-->
+					<div class="line"></div>
+					
+					<!--控制条-->
+					<div class="player-control">
+						
+						<!--循环播放-->
+						<div class="play-type mini on">
+							<a href="javascript:;" id="circle" class="icon icon-circla"></a>
+							<ul>
+								<li>
+									<a href="javascript:;">
+										<span class="icon icon-circla"></span>
+										<span>循环播放</span>
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;">
+										<span class="icon icon-sinle"></span>
+										<span>单曲循环</span>
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;">
+										<span class="icon icon-order"></span>
+										<span>列表循环</span>
+									</a>
+								</li>
+							</ul>
+						</div>
+						
+						<!---->
+						<div class="song-control">
+							<!--上一曲-->
+							<a href="javascript:;" id="prev" class="icon icon-prev"></a>
+							<!--暂停-->
+							<a href="javascript:;" id="pause"class="icon icon-play"></a>
+							<!--下一曲-->
+							<a href="javascript:;" id="next"class="icon icon-next"></a>
+						</div>
+						
+						<!--循环播放-->
+						<div class="play-type on">
+							<a href="javascript:;" id="circle" class="icon icon-circla"></a>
+							<ul>
+								<li>
+									<a href="javascript:;">
+										<span class="icon icon-circla"></span>
+										<span>循环播放</span>
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;">
+										<span class="icon icon-sinle"></span>
+										<span>单曲循环</span>
+									</a>
+								</li>
+								<li>
+									<a href="javascript:;">
+										<span class="icon icon-order"></span>
+										<span>列表循环</span>
+									</a>
+								</li>
+							</ul>
+						</div>
+						
+						<!--音量-->
+						<div id="valume">
+							<a href="javascript:;" id="valume-btn" class="icon icon-valume "></a>
+							<div class="valume-progress">
+								<div class="value-ball ball"></div>
+								<div class="valume-on"></div>
+							</div>
+						</div>
+						
+						<!--列表-->
+						<a href="javascript:;" id="list"class="icon icon-list"></a>
+					</div>
+				</div>
+				<!--歌曲进度-->
+				<div class="song-schedule">
+					<div class="song-progress">
+						<div class="song-ball ball"></div>
+						<div class="song-comple"></div>
+					</div>
+					
+					<div class="song-time">
+						<span class="comTime"></span>
+						<span class="allTime"></span>
+					</div>
+				</div>
+			</div>
+			<div class="move icon-drag"></div>
+		</div>
+		
+	</body>
+	
+		
+		<script type="text/javascript">
+			$(function(){
+				//音频
+				var  audio={
+					//播放器初始化
+					init:function(){
+						var  that=this
+						//获取歌曲信息
+						$.ajax({
+							type:"GET",
+							url:"data/music.json",
+							async:true,
+							success:function(data){
+								sessionStorage.setItem("songList",JSON.stringify(data))
+								that.songList(data)
+								that.changeText(data[0]);
+							}
+						});
+						this.playerMove()
+						//播放类型
+					    this.playType="circle";
+						this.SelectType();
+						this.screenResize()
+						this.songListShow();
+						this.nextPlay();
+						this.prevPlay()
+						this.clickPlay();
+						this.changeList()
+						this.controlSound()
+						this.controlSong();
+						this.controlAudio();
+
+						//默认音量
+						$("#audio")[0].volume=0.5;
+						this.updateProgress($(".value-ball"),$(".valume-on"),$(".valume-progress").width()/3);
+						
+					},
+					screenResize:function(){
+						$(window).on("resize",function(){
+							
+							$(".song-list").hide().addClass("on")
+							$(".player-wrap").css({
+								"top":100,
+								"left":0
+							})
+							
+						})
+					},
+					//可以移动播放器
+					playerMove:function(){
+						$(".player-wrap").bind("mousedown",function(e){
+							var  target=e.target;
+							e.preventDefault();
+							
+							//获取浏览器宽高
+							var broW=$(document).width();
+							var broH=$(document).height();
+							//获取播放器宽高
+							var pH=$(".player-wrap").height();
+							var pW=$(".player-wrap").outerWidth()
+							//获取播放器点击点距离上左的距离
+							var pLeft=e.clientX-this.offsetLeft;
+							var pTop=e.clientY-this.offsetTop;
+							if(target.className.indexOf("move")>-1){
+								$(document).on("mousemove",function(e){
+									var moveX=e.clientX-pLeft;
+									var moveY=e.clientY-pTop;
+									//边界值处理
+									if(moveX<0) moveX=0;
+									if(moveY<0) moveY=0;
+									if(moveX>(broW-pW))  moveX=broW-pW;
+									if(moveY>(broH-pH))  moveY=broH-pH;
+									//console.log(moveY,moveX)
+									
+									$(".player-wrap").css({
+										"left":moveX,
+										"top":moveY
+									})
+								})
+							}
+							
+						
+						})
+						$(document).bind("mouseup",function(){
+							$(document).off("mousemove")
+						})
+					},
+					//下一曲控制
+					nextPlay:function(){
+						var  that=this;
+					     $("#next").click(function(){
+							$("#audio")[0].play()
+					     	var  songLen=$(".song-list li").length
+							  	//找到上一个的歌曲ID，和列表Id
+							    var listId=$("#audio").attr("listid");
+							    listId++;
+							    if(listId>=songLen){
+							    	listId=0;
+							    }
+							    var  songid =  $(".song-list li").eq(listId).children().attr("songid");
+							    that.nextSong(listId,songid)
+							   
+					     })
+					},
+					//下一曲
+					nextSong:function(listId,songid){
+						$("#audio").attr({
+					    	"listid":listId,
+					    	"songid":songid
+						})
+						this.getSong();
+					},
+					//上一曲控制
+					prevPlay:function(){
+						var  that=this;
+						  $("#prev").click(function(){
+								$("#audio")[0].play()
+								var  songLen=$(".song-list li").length
+							  	//找到上一个的歌曲ID，和列表Id
+							    var listId=$("#audio").attr("listid");
+							    listId--;
+							    if(listId<0){
+							    	listId=songLen-1;
+							    }
+							    var  songid =  $(".song-list li").eq(listId).children().attr("songid")
+							    $("#audio").attr({
+							    	"listid":listId,
+							    	"songid":songid
+							    })
+						     that.getSong()
+					     })
+					},
+					//点击播放、暂停，跟audio有关
+					clickPlay:function(){
+						var  audio=$("#audio")[0];
+						$("#pause").click(function(){
+							if($(this).hasClass("icon-pause")){
+								audio.play()
+							}else{
+								audio.pause()
+							}
+						})
+					
+					},
+					//初始化歌曲信息
+					changeText:function(data){
+						//头像
+						$(".songImg img").attr("src",data.songImg)
+						//歌名
+						$("#songName").html(data.songName)
+						//歌手
+						$("#singer").html(data.singerName)
+						//设置音频
+						$("#audio").attr({
+							"src":data.songSrc,
+							"songId":data.songId
+						})
+						//时间初始化
+						$(".comTime").html("00:00");
+						this.updateProgress($(".song-ball"),$(".song-comple"),0);
+						//获取歌曲总时间+播放时间
+						this.getTime();
+					},
+					//控制音量，跟audio有关
+					controlSound:function(){
+						var  ball=$(".value-ball");
+						var  progress=$(".valume-progress");
+						var  onProgress=$(".valume-on");
+						var  that=this;
+						var  pVal=0;
+						var  audio=$("#audio")[0]
+						//音量条控制
+						this.changeProgress(progress,ball,onProgress);
+						//点击音量按钮，静音
+						$("#valume-btn").click(function(){
+							if($(this).hasClass("muted")){
+								$(this).removeClass("muted").removeClass("icon-novolume").addClass("icon-valume");
+								audio.muted=false;
+								that.updateProgress(ball,onProgress,pVal);
+							}else{
+								pVal=ball.css("left")
+								$(this).addClass("muted").addClass("icon-novolume").removeClass("icon-valume");
+								audio.muted=true;
+								that.updateProgress(ball,onProgress,0);
+							}
+						})
+					},
+					//歌曲进度条控制
+					controlSong:function(){
+						var  ball=$(".song-progress").find(".song-ball");
+						var  pW=$(".song-progress").width();
+						this.changeProgress($(".song-progress"),ball,$(".song-comple"))
+					},
+					//音频事件控制
+					controlAudio:function(){
+						var  audio=$("#audio")[0];
+
+						var  that=this
+						//播放结束
+						audio.addEventListener("ended",function(){
+							switch (that.playType){
+								//循环播放
+								case "circle":
+									$("#next").trigger("click")
+									break;
+								//单曲循环
+								case "sinle":
+									$("#pause").trigger("click");
+									break;
+								//顺序播放
+								case "order":
+					     			var  songLen=$(".song-list li").length; 
+								  	//找到上一个的歌曲ID，和列表Id
+								    var listId=$("#audio").attr("listid");
+							    	listId++;
+								    if(listId>=songLen){
+								    	listId=songLen-1;
+								    	return ;
+								    }
+								    var  songid =  $(".song-list li").eq(listId).children().attr("songid");
+								    that.nextSong(listId,songid)
+									break;
+							}
+							
+						})
+						//播放开始
+						audio.addEventListener("play",function(){
+							$("#pause").addClass("icon-play").removeClass("icon-pause")
+						})
+						//播放停止
+						audio.addEventListener("pause",function(){
+							$("#pause").removeClass("icon-play").addClass("icon-pause")
+						})
+					},
+					//进度条拖动和点击逻辑，跟audio有关
+					changeProgress:function(progress,ball,onProgress){
+						var  pW=progress.width();
+						var  bW=ball.width()
+						var  that=this;
+						var  left=0;
+						//上次我点击轨道没有效，是因为PW-BW没有加括号
+						var  volumeR= 1/(pW-bW);
+						
+						progress.on("click",function(e){
+							left=e.offsetX;
+							var  target=e.target;
+							if(target==ball[0]) return ;
+							//临界值处理
+							if(left>pW-ball.width()){
+								left=pW-ball.width()
+							}
+							//点击的是歌曲进度条的时候
+							if(progress[0]==$(".song-progress")[0]){
+								//点击进度条清除定时器
+								clearInterval(that.timer);
+								$("#audio")[0].currentTime=left*(that.alltime/(pW-bW));
+								var time=that.timeFormat($("#audio")[0].currentTime)
+								//更新进度条和播放时间
+								that.setCurrentTime(time,left)
+							}
+							//点击的是音量条
+							if(progress[0]==$(".valume-progress")[0]){
+								//设置音量
+								$("#audio")[0].volume=left*volumeR
+								//console.log($("#audio")[0].volume)
+								//更新音量条
+								that.updateProgress(ball,onProgress,left)
+							}
+							
+						});
+						//鼠标点下清除定时器
+						ball.on("mousedown",function(e){
+							var clickX=progress.offset().left;
+							//clearInterval(that.timer)
+							$(document).on("mousemove",function(e){
+								 left=e.clientX-clickX;
+								//边界值处理
+								if(left>pW-ball.width()){
+									left=pW-bW;
+								}else if(left<0){
+									left=0
+								}
+								//点击的是歌曲进度条的时候
+								if(progress[0]==$(".song-progress")[0]){
+									$("#audio")[0].currentTime=left*(that.alltime/(pW-bW));
+									//格式化时间
+									var time=that.timeFormat($("#audio")[0].currentTime)
+									//更新进度条
+									that.setCurrentTime(time,left)
+								}
+								//点击的是音量条
+								if(progress[0]==$(".valume-progress")[0]){
+									//设置音量
+									$("#audio")[0].volume=left*volumeR
+									//更新音量条
+									that.updateProgress(ball,onProgress,left)
+								}
+							})
+						})
+						//鼠标抬起设置定时器
+						$(document).on("mouseup",function(e){
+							//that.getCurrentTime()
+							$(document).off("mousemove")
+						})
+						
+					},
+					//进度条样式改变
+					updateProgress:function(ball,onProgress,left){
+						ball.css("left",left);
+						onProgress.width(left)
+					},
+					//播放类型
+					SelectType:function(){
+						var a=$(".play-type").find("ul a");
+						//var type=$(".play-type").find("ul .icon");
+						var typeShow=$(".play-type").find("#circle");
+						var that=this;
+						//列表显示隐藏
+						$(".play-type").click(function(){
+							if($(this).hasClass("on")){
+								$(this).removeClass("on")
+							}else{
+								$(this).addClass("on")
+							}
+							
+						})
+						//选择类型
+						a.click(function(){
+							//得到播放类型
+							var getType=$(this).find(".icon").attr("class")
+							typeShow.attr("class",getType)
+							if(getType.indexOf("circla")>-1){
+								that.playType="circle"
+							}else if(getType.indexOf("sinle")>-1){
+								
+								that.playType='sinle'
+							}else if(getType.indexOf("order")>-1){
+								
+								that.playType="order"
+							}
+							console.log(that.playType)
+						})
+					},
+					//歌曲列表的显示和隐藏
+					songListShow:function(){
+						//检测播放器距离顶部的距离	top: -200px;
+						//如果是小于列表的高度，列表在播放器下面
+						//如果是大于列表的高度，列表在播放器上面
+						$("#list").click(function(){
+							var pTop=$(".player-wrap").offset().top;
+							var pLeft=$(".player-wrap").offset().left;
+							var pW=$(".player-wrap").outerWidth()
+							var pH=$(".player-wrap").outerHeight()
+							var listH=$(".song-list").height()
+							console.log(listH)
+							
+							if($(".song-list").hasClass("on")){
+								//有on就显示
+								//$(".song-list").css("visibility","visible")
+								$(".song-list").fadeIn(500)
+								$(".song-list").removeClass("on")
+							}else{
+								//没有on就隐藏
+								$(".song-list").fadeOut(500)
+								$(".song-list").addClass("on")
+							}
+							//大小屏的时候，歌曲列表的位置调整
+							if(pW>800){
+								$(".song-list").css("left",0)
+								if(pTop<200){
+									$(".song-list").css("top",pH)
+								}else{
+									$(".song-list").css("top",-listH)
+								}
+							}else {
+								$(".song-list").css("top",0)
+								if(pLeft<360){
+									$(".song-list").css("left",pW)
+								}else{
+									$(".song-list").css("left",-pW)
+								}
+							}
+							
+							//console.log(pTop)
+							
+							//滚动条有两种，一种是小屏的，一种是大屏的，所以只能在点击列表的时候生成
+							//而且点击列表的时候生成的话，这样就解决了获取高度的问题。
+							//一开始因为列表隐藏，获取不到高度，我的滚动条生成不了
+							//滚动条的创建应该在歌曲加载完之后
+							roller.init({
+								rollClass:"roller",
+								orbitalClass:"orbital",
+								content:$(".song-content"),
+								outBox:$(".song-list")
+							})
+						})
+					},
+					//歌曲列表初始化
+					songList:function(data){
+
+						var songList=$(".song-list ul")
+						$.each(data, function(index,item) {
+							var song=[
+								'<li><a href="javascript:;"  songId=',
+								item.songId,
+								'>',
+								item.songName,
+								" - ",
+								item.singerName,
+								'</a></li>'
+								].join("");
+							songList.append(song);
+							//默认播放第一首
+							if(index==0) songList.children("li").first().addClass("on")
+						});
+						$("#audio").attr("listid",0)
+					},
+					//点击列表换歌
+					changeList:function(){
+						var songList=$(".song-list ul");
+						var  that=this;
+						songList.on("dblclick","a",function(){
+							var  getsongId=$(this).attr("songid")
+							var  listId=$(this).parent().index();
+							$("#audio").attr("songid",getsongId);
+							$("#audio").attr("listid",listId);
+							//得到播放的歌曲
+							that.getSong()
+						})
+					},
+					//得到播放的歌曲，上一曲，下一曲，选择
+					getSong:function(){
+						var that=this;
+						//得到歌曲的id和列表中歌曲是第几首
+						var songid=$("#audio").attr("songid");
+						var listid=$("#audio").attr("listid");
+						var  song=JSON.parse(sessionStorage.getItem("songList"))
+						$.each(song,function(index,item){
+							if(item.songId==songid){
+								that.changeText(item)
+							}
+						})
+						//同步更新歌曲列表中选中的歌曲
+						$(".song-list ul a").eq(listid).parent().addClass("on").siblings().removeClass("on")
+					},	
+					//得到歌曲时间，跟audio有关
+					getTime:function(){
+						var  audio=$("#audio")[0];
+						var  that=this;
+						//要等到音频可以播放了才能设置时间，否则是NAN
+						audio.oncanplay=function(){
+							that.alltime=audio.duration;
+							//格式化时间
+							alltime=that.timeFormat(that.alltime);
+							$(".allTime").html(alltime);
+							that.getCurrentTime()
+						}
+					},
+					//自动更新和手动拖动都要用到
+					getCurrentTime:function(){
+						var  that=this;
+						var  audio=$("#audio")[0];
+						var  proMaxLen=$(".song-progress").width()-$(".song-ball").width();
+						//计算总时长和进度条的比例
+						var  songRatio=that.alltime/proMaxLen;
+						var  cTime=0,onProVal;
+						//每次开始下一首都要清除一次定时器，不然会有很多个定时器同时工作
+						clearInterval(that.timer)
+						//更新播放时间
+						that.timer=setInterval(function(){
+							cTime=audio.currentTime;
+							onProVal=cTime/songRatio;
+							cTime=that.timeFormat(cTime)
+							that.setCurrentTime(cTime,onProVal);
+						},1000)
+					},
+					//更新播放时间和进度条
+					setCurrentTime:function(cTime,onProVal){
+						//更新时间
+						$(".comTime").html(cTime);
+						//更新进度条
+						this.updateProgress($(".song-ball"),$(".song-comple"),onProVal)
+					},
+					//歌曲时间格式化
+					timeFormat:function(time){
+						var min=Math.floor(time/60);
+						var second=Math.ceil(time%60);
+						min=min<10?("0"+min):min;
+						second=second<10?("0"+second):second;
+						var  time=min+":"+second;
+						
+						return time;
+					}
+				}
+				//自定义滚动条
+				var roller={
+					//初始化
+					init:function(roll){
+						var rollCls=roll.rollClass;
+						var orbitalCls=roll.orbitalClass;
+						var content=roll.content;//内容
+						var outBox=roll.outBox;//外层盒子
+						
+						// 可能会创建多个滚动条，要进行初始化
+						if($("."+orbitalCls).length){
+							$("."+orbitalCls).remove()
+						}
+						
+						//传入外层盒子，明确是谁的滚动条
+						var roller=this.createRoller(roll);
+						this.clickRoller(roller,content,outBox);
+						this.dragRoller(roller,content,outBox);
+						this.rollRoller(roller,content,outBox);
+						
+						
+					},
+					//创建滚动条
+					createRoller:function(roll){
+						//创建滚轮
+						var roller=$("<div></div>");
+						//创建轨道
+						var orbital=$("<div></div>");
+						orbital.append(roller);
+						roll.outBox.append(orbital)
+						//调整滚动条
+						this.resizeRoller(roller,orbital,roll);
+						
+						return roller;
+						
+					},
+					//调整滚动条,添加样式
+					resizeRoller:function(roller,orbital,roll){
+						//滚轮的高度要计算内容高和显示高的比例
+						var conH=roll.content.height();
+						var outH=roll.outBox.outerHeight();
+						//内容跟外框的比例==滚动条跟轨道的比例
+						var rollRadio=outH*outH/conH;
+						if(outH>conH) roller.css("display","none");
+						//设置样式
+						orbital.css({
+							"position":"absolute",
+							"right":0,
+							"top":0,
+							"overflow":"hidden"
+						}).addClass(roll.orbitalClass)
+						roller.css({
+							"position":"absolute",
+							"top":0,
+							"height":rollRadio
+						}).addClass(roll.rollClass)
+					
+					},
+					//点击查看
+					clickRoller:function(roller,content,outBox){
+						var  rollerH=roller.height();
+						var  orbital=roller.parent();
+						var  that=this;
+						orbital.on("click",function(e){
+							var  clickY=e.offsetY;
+							//边界值处理
+							//判断点击的位置是多大。
+							var  moveY=(clickY>rollerH)?clickY-rollerH:clickY
+							if(e.target==roller[0]) return ;
+							that.updateContent(roller,moveY,outBox,content)
+						})
+						
+						
+					},
+					//拖动查看
+					dragRoller:function(roller,content,outBox){
+						var  orbital=roller.parent();
+						var  orbitalH=orbital.height();
+						var  rollH=roller.height()
+						var  that=this;
+						roller.on("mousedown",function(e){
+							//奇怪了，本来我认为这个clickY是相对轨道的，没想到是相对滚轮的
+							//而刚好一点击的时候，moveY相对于轨道顶端，clickY相对滚轮，距离就是滚轮距离顶部的距离了。
+							//刚点没有移动的时候，moveY-clickY就是滚轮距离上顶部的距离
+							//如果clickY不是相对滚轮，那么应该加上已经滚的位置
+							var  clickY=e.offsetY;
+							//获取已经滚动的距离
+							var  hasTop=roller.position().top;
+							//得到滚轮最大的滚动距离
+							var  maxRH=orbitalH-rollH;
+							//console.log(clickY)
+							$(document).on("mousemove",function(e){
+								//得到鼠标距离轨道顶部的距离
+								var moveY=e.pageY-orbital.offset().top;
+								console.log(moveY,clickY)
+								//得到鼠标滑动的距离
+								moveY=moveY-clickY;
+								moveY=moveY<0?0:moveY
+								moveY=moveY>maxRH?maxRH:moveY
+								//console.log(moveY)
+								that.updateContent(roller,moveY,outBox,content)
+							})
+						})
+						
+					},
+					//滚动查看
+					rollRoller:function(roller,content,outBox){
+						//放在外面的都是死值
+						var  orbital=roller.parent();
+						var  orbitalH=orbital.height();
+						var  rollH=roller.height()
+						var  scrollTime=0;
+						var  scrollDit=0
+						//得到滚轮最大的滚动距离
+						var  maxRH=orbitalH-rollH;
+						var  that=this;
+						
+						mouseWheel(outBox[0])
+						
+						function  mouseWheel(dom){
+							//判断什么浏览器
+							var  mousewheel=navigator.userAgent.indexOf("Firefox")==-1?"mousewheel":"DOMMouseScroll";
+							if(document.addEventListener){
+								dom.addEventListener(mousewheel,function(e){
+									//整数向上，负数向下
+									//其他的，其他用wheelDelta -+120,
+								    //其他浏览器竟然往下是负值，我去，跟火狐相反，我只能转为正值在传过去了
+									//火狐的，火狐用detail  -+3
+									var scroll=-e.wheelDelta||(e.detail*40);
+									wheelDealFn(scroll)
+								})
+							}else{
+								dom.attachEvent(mousewheel,function(e){
+										var scroll=e.wheelDelta;
+										wheelDealFn(scroll)
+								})
+							}
+						}
+						function wheelDealFn(scroll){
+							//获取已经滚动的距离
+							console.log(scroll)
+							var  hasTop=roller.position().top;
+							console.log(hasTop)
+							
+							
+							//把值变小一点，好计算一次滚动多少，120除以12就是10了
+							scrollTime+=scroll/12
+							//已经滚动的加上滚的
+							scrollDit=scrollTime+hasTop;
+							
+							
+							//边界值计算
+							//还要让滚动值相加停止scrollTime=0,否则scrollTime一直增加和减少导致到头后滚动失灵
+							scrollDit=scrollDit<0?(scrollTime=0,0):scrollDit;
+							scrollDit=scrollDit>maxRH?(scrollTime=0,maxRH):scrollDit
+							
+							that.updateContent(roller,scrollDit,outBox,content)
+							
+						}
+						
+					},
+					//根据滚轮更新显示内容
+					updateContent:function(roller,rollTop,outBox,content){
+						//滚动条最大滚动距离
+						var maxRH=roller.parent().height()-roller.height();
+						//内容最大滚动距离
+						var maxCH=content.height()-outBox.height()
+						//获取应该显示哪一部份内容
+						//内容滚动的距离/内容最大滚动的距离=滚轮滚动距离/滚轮滚动最大距离
+						var  scrollH=maxCH*rollTop/maxRH
+						//这样算也可以
+//						var scrollH=rollTop*content.height()/outBox.height();
+						
+						content.css("top",-scrollH)
+						roller.css("top",rollTop)
+					}
+				}
+				
+				
+				audio.init()
+				
+				
+			})
+		</script>
+	
+</html>

@@ -1,0 +1,59 @@
+[{
+	"songId":6,
+	"songName":"童话",
+	"singerName":"光良",
+	"songImg":"img/singer/guang2.jpg",
+	"songSrc":"music/童话.mp3"
+},{
+	"songId":87,
+	"songName":"海口",
+	"singerName":"后弦",
+	"songImg":"img/singer/ho3.jpg",
+	"songSrc":"music/海口.mp3"
+},{
+	"songId":3,
+	"songName":"下完这场雨",
+	"singerName":"后弦",
+	"songImg":"img/singer/ho4.jpg",
+	"songSrc":"music/下完这场雨.mp3"
+},{
+	"songId":44,
+	"songName":"唐宋元明清",
+	"singerName":"后弦",
+	"songImg":"img/singer/ho6.jpg",
+	"songSrc":"music/唐宋元明清.mp3"	
+},{
+	"songId":57,
+	"songName":"没有你，我什么都不是",
+	"singerName":"陈柏宇",
+	"songImg":"img/singer/baiyu.jpg",
+	"songSrc":"music/没有你我什么都不是.mp3"
+},{
+	"songId":1,
+	"songName":"慢四恋曲",
+	"singerName":"后弦",
+	"songImg":"img/singer/ho10.jpg",
+	"songSrc":"music/慢四恋曲.mp3"
+	
+},{
+	"songId":33,
+	"songName":"我爱的人",
+	"singerName":"林宥嘉",
+	"songImg":"img/singer/ho10.jpg",
+	"songSrc":"music/我爱的人.mp3"
+	
+},{
+	"songId":22,
+	"songName":"娃娃脸",
+	"singerName":"后弦",
+	"songImg":"img/singer/ho10.jpg",
+	"songSrc":"music/娃娃脸.mp3"
+	
+},{
+	"songId":88,
+	"songName":"第二人生",
+	"singerName":"五月天",
+	"songImg":"img/singer/ho10.jpg",
+	"songSrc":"music/第二人生.mp3"
+	
+}]
