@@ -27,8 +27,13 @@
 			.player-wrap{
 				background-color: rgba(0,0,0,0.8);
 				padding: 0 10px;box-sizing: border-box;position: fixed;
-				top: 100px;
-				left: 200px;
+				top: 50%;
+				left: 50%;
+				-webkit-transition: translate(-50%,-50%);
+				-moz-transition: translate(-50%,-50%);
+				-ms-transition: translate(-50%,-50%);
+				-o-transition:translate(-50%,-50%) ;
+				transition:translate(-50%,-50%) ;
 			}
 			
 			.player-inner{position: relative;}
@@ -325,6 +330,7 @@
 		
 		<script type="text/javascript">
 			$(function(){
+			
 				//音频
 				var  audio={
 					//播放器初始化
@@ -371,6 +377,7 @@
 							
 						})
 					},
+					
 					//可以移动播放器
 					playerMove:function(){
 						$(".player-wrap").bind("mousedown",function(e){
@@ -380,21 +387,26 @@
 							//获取浏览器宽高
 							var broW=$(document).width();
 							var broH=$(document).height();
+							
 							//获取播放器宽高
 							var pH=$(".player-wrap").height();
 							var pW=$(".player-wrap").outerWidth()
+							
 							//获取播放器点击点距离上左的距离
 							var pLeft=e.clientX-this.offsetLeft;
 							var pTop=e.clientY-this.offsetTop;
+							
 							if(target.className.indexOf("move")>-1){
 								$(document).on("mousemove",function(e){
 									var moveX=e.clientX-pLeft;
 									var moveY=e.clientY-pTop;
+									
 									//边界值处理
 									if(moveX<0) moveX=0;
 									if(moveY<0) moveY=0;
 									if(moveX>(broW-pW))  moveX=broW-pW;
 									if(moveY>(broH-pH))  moveY=broH-pH;
+									
 									//console.log(moveY,moveX)
 									
 									$(".player-wrap").css({
