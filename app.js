@@ -1,7 +1,7 @@
 const express = require('express'); //托管静态资源
 const app = express();
 
-const PORT = 80; //服务端分配端口，需与nginx配置保持一致
+const PORT = 9000; //服务端分配端口，需与nginx配置保持一致
 const PATH = '/'; //服务端分配的路径，需与nginx配置保持一致，访问的虚拟路径，文件不在这里
 
 /**
